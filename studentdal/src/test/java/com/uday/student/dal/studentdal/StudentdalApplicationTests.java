@@ -6,12 +6,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.uday.student.dal.studentdal.repos.StudentRepository;
+
+import java.util.Optional;
+
 import com.uday.student.dal.studentdal.entities.Student;
-
-
-
-
-
 
 @SpringBootTest
 public class StudentdalApplicationTests {
@@ -30,6 +28,27 @@ public class StudentdalApplicationTests {
 		studentRepository.save(student);
 
 	}
+
+	@Test
+	public void testFindStudentById() {
+		Optional<Student> student = studentRepository.findById(1l);
+		System.out.println(student);
+	}
+
+	@Test
+	public void testUpdateStudent() {
+		Student student = studentRepository.findById(1l).get();
+		student.setFee(40d);
+		studentRepository.save(student);
+	}
+
+	@Test
+	public void testDeleteStudent() {
+		Student student = new Student();
+		student.setId(1l);
+		studentRepository.delete(student);
+	}
+	
 
 }
 
