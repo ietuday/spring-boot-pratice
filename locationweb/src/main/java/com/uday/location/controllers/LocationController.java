@@ -2,8 +2,13 @@ package com.uday.location.controllers;
 
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import com.uday.location.entities.Location;
+import com.uday.location.repos.LocationRepository;
 import com.uday.location.service.LocationService;
+import com.uday.location.util.EmailUtil;
+import com.uday.location.util.ReportUtil;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +24,18 @@ public class LocationController {
     @Autowired
     LocationService locationService;
 
+    @Autowired
+	LocationRepository repository;
+
+    @Autowired
+    EmailUtil emailUtil;
+
+    @Autowired
+	ReportUtil reportUtil;
+
+	@Autowired
+	ServletContext sc;
+
     @RequestMapping("/showCreate")
     public String showCreate(){
         return "createLocation";
@@ -29,6 +46,14 @@ public class LocationController {
         Location locationSaved = locationService.saveLocation(location);
         String msg = "Location saved with id:" + locationSaved.getId();
         modelMap.addAttribute("msg", msg);
+
+        // emailUtil.sendEmail("chaudhariniketa31394@gmail.com", "Test from Spring Boot", "This is Udayaditya Singh , Trying to send Mail when data is saved to DB.");
+        try {
+            emailUtil.sendEmail("udayaditya.singh@gmail.com", "Test from Spring Boot", "This is Udayaditya Singh , Trying to send Mail when data is saved to DB.");
+        } catch (Exception e) {
+            System.out.println("ERROR"+e);
+            e.printStackTrace();
+        }
         return "createLocation";
     }
 
@@ -62,5 +87,14 @@ public class LocationController {
 		List<Location> locations = locationService.getAllLocations();
 		modelMap.addAttribute("locations", locations);
 		return "displayLocations";
+    }
+    
+    @RequestMapping("/generateReport")
+	public String generateReport() {
+		String path = sc.getRealPath("/");
+		List<Object[]> data = repository.findTypeAndTypeCount();
+		reportUtil.generatePieChart(path, data);
+		return "report";
+
 	}
 }
